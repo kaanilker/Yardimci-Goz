@@ -56,7 +56,7 @@ yardimci-goz/
 **Prerequisites:** A PHP-capable web server with cURL enabled, and a [Groq API key](https://console.groq.com/keys).
 
 ```bash
-git clone https://github.com/yourusername/yardimci-goz.git
+git clone https://github.com/kaanilker/yardimci-goz.git
 cd yardimci-goz
 cp config.example.php config.php
 # Open config.php and add your Groq API key
