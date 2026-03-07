@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Yardımcı Göz – Belge Asistanın</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ═══════════════════════════════════════════════════
+       TEMA — Toplumsal Fayda Paleti
+    ═══════════════════════════════════════════════════ */
+    :root {
+      /* Zemin & Yüzeyler */
+      --bg:          #F4F5F7;
+      --surface:     #FFFFFF;
+      --warm:        #ECEEF2;
+      --border:      #D8DCE4;
+
+      /* Marka — Bilimsel Güven Mavisi */
+      --brand:       #2C3E50;
+      --brand-h:     #1e2d3d;
+      --brand-s:     #34568B;
+
+      /* Vurgu — Adaçayı / Toplum Yeşili */
+      --green:       #5B8A72;
+      --green-h:     #3d6b55;
+      --green-s:     #e8f2ec;
+
+      /* Aksiyon — Sıcak Kiremit */
+      --action:      #D96C5B;
+      --action-h:    #be5545;
+      --action-s:    #fdf0ee;
+
+      /* Metin */
+      --text:        #1A1A1A;
+      --muted:       #5A6575;
+      --muted-s:     #8A97A8;
+
+      /* Sohbet baloncukları */
+      --ai-bg:       #F0F4F8;
+      --user-bg:     #EAF2EE;
+
+      /* Gölgeler — flat design, hafif tutuldu */
+      --shadow-sm:   0 1px 4px rgba(44,62,80,.07);
+      --shadow-md:   0 3px 14px rgba(44,62,80,.10);
+      --shadow-lg:   0 8px 30px rgba(44,62,80,.13);
+
+      /* Hata */
+      --red:         #C0392B;
+      --red-h:       #a02d21;
+
+      --r:           16px;
+      --font-base:   18px;
+    }
+
+    /* Yazı boyutu kademeleri */
+    body.text-lg  { --font-base: 21px; }
+    body.text-xl  { --font-base: 25px; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      font-family: 'Nunito', sans-serif;
+      font-size: var(--font-base);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── HEADER ─────────────────────────────── */
+    header {
+      width: 100%;
+      background: var(--brand);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 12px rgba(44,62,80,.25);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-logo h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.65rem;
+      color: #fff;
+      letter-spacing: .5px;
+    }
+    .header-logo p {
+      font-size: .8rem;
+      color: rgba(255,255,255,.65);
+      margin-top: 1px;
+    }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
+
+    /* Yazı boyutu butonları */
+    .font-btns {
+      display: flex;
+      gap: 4px;
+      background: rgba(255,255,255,.15);
+      border-radius: 10px;
+      padding: 4px 6px;
+    }
+    .font-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 6px;
+      transition: background .15s;
+      line-height: 1;
+    }
+    .font-btn:hover  { background: rgba(255,255,255,.2); }
+    .font-btn.active { background: rgba(255,255,255,.35); }
+    .font-btn.small  { font-size: .85rem; }
+    .font-btn.large  { font-size: 1.15rem; }
+    .font-btn.xlarge { font-size: 1.35rem; }
+
+    /* Hakkında butonu */
+    #about-btn {
+      background: rgba(255,255,255,.18);
+      border: 1.5px solid rgba(255,255,255,.4);
+      color: #fff;
+      border-radius: 10px;
+      padding: 7px 12px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    #about-btn:hover { background: rgba(255,255,255,.28); }
+
+    /* ── MODAL ──────────────────────────────── */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(46,31,14,.55);
+      backdrop-filter: blur(4px);
+      z-index: 900;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border-radius: var(--r);
+      padding: 32px 28px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      max-height: 85dvh;
+      overflow-y: auto;
+    }
+    .modal h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: var(--brand);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal p {
+      font-size: .95rem;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 14px;
+    }
+    .modal .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0;
+    }
+    .tag {
+      background: var(--warm);
+      color: var(--brand);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: .82rem;
+      font-weight: 700;
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: var(--warm);
+      border: none;
+      border-radius: 8px;
+      width: 34px; height: 34px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--brand);
+      transition: background .2s;
+    }
+    .modal-close:hover { background: var(--border); }
+
+    /* ── ANA İÇERİK ─────────────────────────── */
+    main {
+      width: 100%;
+      max-width: 540px;
+      padding: 22px 16px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* ── HOŞGELDİN KARTI ────────────────────── */
+    #welcome {
+      background: var(--surface);
+      border-radius: var(--r);
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+      border: 1.5px solid var(--border);
+    }
+    #welcome .emoji { font-size: 3rem; margin-bottom: 10px; }
+    #welcome h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.45rem;
+      color: var(--brand);
+      margin-bottom: 8px;
+    }
+    #welcome p { font-size: .95rem; color: var(--muted); line-height: 1.7; }
+
+    /* ── ADIM ETİKETİ ───────────────────────── */
+    .step-label {
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding-left: 2px;
+    }
+
+    /* ── ÖNCE GÖRSELİ ───────────────────────── */
+    #preview-box {
+      width: 100%;
+      aspect-ratio: 4/3;
+      border-radius: var(--r);
+      overflow: hidden;
+      background: var(--warm);
+      border: 2.5px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color .3s, box-shadow .3s;
+    }
+    #preview-box:hover { border-color: var(--brand-s); box-shadow: var(--shadow-sm); }
+    #preview-box.has-image { border-style: solid; border-color: var(--brand-s); cursor: default; }
+    #preview-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: none;
+      transition: transform .3s;
+    }
+    /* Lightbox — fotoğrafa tıklayınca büyüt */
+    #preview-box.has-image #preview-img { cursor: zoom-in; }
+
+    #preview-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    #preview-placeholder span { font-size: 1rem; font-weight: 700; }
+
+    /* ── LİGHTBOX ───────────────────────────── */
+    #lightbox {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.88);
+      z-index: 800;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      cursor: zoom-out;
+    }
+    #lightbox.open { display: flex; }
+    #lightbox img {
+      max-width: 100%;
+      max-height: 90dvh;
+      border-radius: 12px;
+      box-shadow: 0 0 60px rgba(0,0,0,.6);
+    }
+
+    /* ── BUTONLAR ───────────────────────────── */
+    #file-input { display: none; }
+
+    .btn {
+      width: 100%;
+      padding: 18px 0;
+      border-radius: var(--r);
+      border: none;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: transform .15s, filter .15s;
+      -webkit-tap-highlight-color: transparent;
+      color: #fff;
+      box-shadow: var(--shadow-md);
+      letter-spacing: .3px;
+    }
+    .btn:active   { transform: scale(.97); filter: brightness(.9); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    #capture-btn { background: var(--action); box-shadow: var(--shadow-sm); }
+    #capture-btn:hover { background: var(--action-h); }
+    #voice-btn   { background: var(--brand); font-size: 1.1rem; box-shadow: var(--shadow-sm); }
+    #voice-btn.recording {
+      background: var(--red);
+      animation: pulse-red 1.4s infinite;
+    }
+    @keyframes pulse-red {
+      0%,100% { box-shadow: 0 6px 20px rgba(192,57,43,.3); }
+      50%      { box-shadow: 0 6px 32px rgba(192,57,43,.6); }
+    }
+
+    .outline-btn {
+      width: 100%;
+      padding: 13px 0;
+      border-radius: 12px;
+      background: transparent;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      -webkit-tap-highlight-color: transparent;
+      border: 2px solid var(--action);
+      color: var(--action-h);
+    }
+    .outline-btn.visible { display: flex; }
+    .outline-btn:active  { background: var(--warm); transform: scale(.97); }
+
+    /* ── DURUM ÇUBUĞU ───────────────────────── */
+    #status-bar { display: none; flex-direction: column; gap: 8px; }
+    #status-bar.visible { display: flex; }
+    #status-msg { font-size: .95rem; font-weight: 700; color: var(--brand); }
+    #progress-track {
+      width: 100%; height: 8px;
+      background: var(--warm);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    #progress-fill {
+      height: 100%; width: 0%;
+      background: var(--action);
+      border-radius: 99px;
+      transition: width .4s ease;
+    }
+
+    /* ── AÇIKLAMA KARTI ─────────────────────── */
+    #description-card {
+      background: var(--surface);
+      border-radius: var(--r);
+      padding: 22px 20px;
+      box-shadow: var(--shadow-md);
+      border: 1.5px solid var(--border);
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+    #description-card.visible { display: flex; }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-title {
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    #description-text {
+      font-size: 1.05rem;
+      line-height: 1.9;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+
+    /* TTS butonu — özet için */
+    #tts-btn {
+      width: 100%;
+      padding: 13px 0;
+      border-radius: 12px;
+      border: 2px solid var(--green);
+      background: var(--green-s);
+      color: var(--green-h);
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #tts-btn:active   { transform: scale(.97); }
+    #tts-btn.speaking { background: var(--green); color: #fff; border-color: var(--green-h); }
+
+    /* ── YÜKLEME ANİMASYONU ─────────────────── */
+    .dots { display: flex; gap: 7px; align-items: center; padding: 6px 0; }
+    .dots span {
+      width: 11px; height: 11px;
+      border-radius: 50%;
+      background: var(--brand-s);
+      animation: blink 1.2s infinite ease-in-out;
+    }
+    .dots span:nth-child(2) { animation-delay: .2s; }
+    .dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes blink {
+      0%,80%,100% { transform: scale(.65); opacity: .45; }
+      40%          { transform: scale(1.1); opacity: 1; }
+    }
+
+    /* ── SOHBET ─────────────────────────────── */
+    #chat-section { display: none; flex-direction: column; gap: 14px; }
+    #chat-section.visible { display: flex; }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #clear-chat-btn {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+    }
+    #clear-chat-btn:hover { border-color: var(--red); color: var(--red); }
+
+    #messages { display: flex; flex-direction: column; gap: 10px; }
+
+    .bubble {
+      padding: 14px 16px;
+      border-radius: 16px;
+      font-size: 1rem;
+      line-height: 1.75;
+      max-width: 92%;
+      word-break: break-word;
+    }
+    .bubble.ai {
+      background: var(--ai-bg);
+      border: 1.5px solid #cdd5e0;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    .bubble.user {
+      background: var(--user-bg);
+      border: 1.5px solid #b0d4c0;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .bubble .who {
+      font-size: .72rem;
+      font-weight: 800;
+      color: var(--muted);
+      letter-spacing: .5px;
+      margin-bottom: 5px;
+    }
+    .bubble-speak {
+      margin-top: 9px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1.5px solid var(--green);
+      background: transparent;
+      color: var(--green-h);
+      font-family: 'Nunito', sans-serif;
+      font-size: .8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: background .2s;
+    }
+    .bubble-speak:hover   { background: var(--green-s); }
+    .bubble-speak.playing { background: var(--green); color: #fff; border-color: var(--green-h); }
+
+    /* ── GİRİŞ ALANI ────────────────────────── */
+    #voice-status {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: center;
+      min-height: 20px;
+    }
+    #input-row { display: flex; gap: 8px; }
+    #text-q {
+      flex: 1;
+      padding: 13px 15px;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      background: var(--surface);
+      font-family: 'Nunito', sans-serif;
+      font-size: .95rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s;
+    }
+    #text-q:focus { border-color: var(--brand-s); }
+    #text-send {
+      padding: 13px 17px;
+      border-radius: 12px;
+      border: none;
+      background: var(--action);
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: background .15s, transform .15s;
+      box-shadow: var(--shadow-sm);
+    }
+    #text-send:active { transform: scale(.93); background: var(--action-h); }
+
+    /* ── LIGHTBOX ───────────────────────────── */
+    #lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.88); z-index: 800; display: none; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; }
+    #lightbox.open { display: flex; }
+    #lightbox img  { max-width: 100%; max-height: 90dvh; border-radius: 12px; }
+
+    /* ── TOAST ──────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(90px);
+      background: var(--red);
+      color: #fff;
+      padding: 13px 22px;
+      border-radius: 12px;
+      font-size: .95rem;
+      font-weight: 700;
+      max-width: 90vw;
+      text-align: center;
+      transition: transform .35s ease;
+      z-index: 999;
+      box-shadow: 0 4px 20px rgba(0,0,0,.2);
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-logo">
+    <svg width="28" height="28" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+    <div>
+      <h1>Yardımcı Göz</h1>
+      <p>Belge asistanın</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <div class="font-btns">
+      <button class="font-btn small  active" onclick="setFont(0)" title="Küçük yazı">A</button>
+      <button class="font-btn large"          onclick="setFont(1)" title="Orta yazı">A</button>
+      <button class="font-btn xlarge"         onclick="setFont(2)" title="Büyük yazı">A</button>
+    </div>
+    <button id="about-btn" onclick="openModal('about-modal')">ℹ️ Hakkında</button>
+  </div>
+</header>
+
+<!-- ── HAKKINDA MODAL ── -->
+<div class="modal-backdrop" id="about-modal" onclick="closeModal('about-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal('about-modal')">✕</button>
+    <h2>👁️ Yardımcı Göz Nedir?</h2>
+    <p>
+      Yardımcı Göz; yaşlı bireyler veya okumakta güçlük çeken kişiler için tasarlanmış
+      bir belge erişilebilirlik asistanıdır. Fatura, ilaç prospektüsü, resmi mektup gibi
+      belgeleri fotoğraflayarak içeriği sade Türkçeyle öğrenebilirsiniz.
+    </p>
+    <p>
+      Önemli tarihleri, ödeme son günlerini ve riskleri otomatik olarak işaretler.
+      Sesli dinleme ve sesli soru sorma özelliği sayesinde ekrana bakmadan da kullanılabilir.
+    </p>
+    <p><strong>Nasıl çalışır?</strong></p>
+    <p>
+      1. Belgeyi fotoğraflayın.<br/>
+      2. Yazılar otomatik olarak okunur (OCR).<br/>
+      3. Yapay zeka belgeyi sade Türkçeyle özetler.<br/>
+      4. Sesli dinleyin veya sorularınızı sorun.
+    </p>
+    <p><strong>Kullanılan teknolojiler:</strong></p>
+    <div class="tag-row">
+      <span class="tag">Tesseract.js (OCR)</span>
+      <span class="tag">Groq API</span>
+      <span class="tag">Llama 3.1 8B</span>
+      <span class="tag">Web Speech API</span>
+      <span class="tag">PHP</span>
+      <span class="tag">HTML / CSS / JS</span>
+    </div>
+    <p style="font-size:.82rem; color:var(--muted); margin-top:6px;">
+      Tüm işlemler tarayıcınızda veya güvenli sunucumuzda gerçekleşir.
+      Fotoğraflarınız kaydedilmez.
+    </p>
+  </div>
+</div>
+
+<!-- ── LİGHTBOX ── -->
+<div id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" alt="Büyük görüntü" />
+</div>
+
+<main>
+
+  <!-- HOŞGELDİN -->
+  <div id="welcome">
+    <div class="emoji">👴👵</div>
+    <h2>Hoş Geldiniz!</h2>
+    <p>Anlamakta zorlandığınız bir belge mi var?<br/>Fotoğrafını çekin, size kolayca açıklayalım.</p>
+  </div>
+
+  <!-- ① KAMERA -->
+  <div class="step-label">📷 Adım 1 — Fotoğraf Çek</div>
+
+  <div id="preview-box" onclick="handlePreviewClick()">
+    <img id="preview-img" alt="Çekilen fotoğraf" />
+    <div id="preview-placeholder">
+      <svg width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24" opacity=".4">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+      </svg>
+      <span>Fotoğraf çekmek için buraya dokun</span>
+    </div>
+  </div>
+
+  <input type="file" id="file-input" accept="image/*" capture="environment" />
+
+  <button class="btn" id="capture-btn" onclick="openCamera()">
+    <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+      <circle cx="12" cy="13" r="4"/>
+    </svg>
+    Fotoğraf Çek
+  </button>
+
+  <!-- OCR ilerleme -->
+  <div id="status-bar">
+    <div id="status-msg">🔍 Yazılar okunuyor…</div>
+    <div id="progress-track"><div id="progress-fill"></div></div>
+  </div>
+
+  <!-- ② ÖZET -->
+  <div id="description-card">
+    <div class="card-header">
+      <div class="card-title">📋 Belge Özeti</div>
+    </div>
+    <div id="description-text"></div>
+    <button id="tts-btn" onclick="toggleMainTTS()">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      </svg>
+      <span id="tts-label">Sesli Dinle</span>
+    </button>
+    <button class="outline-btn" id="new-photo-btn" onclick="resetApp()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <polyline points="1 4 1 10 7 10"/>
+        <path d="M3.51 15a9 9 0 1 0 .49-4.37"/>
+      </svg>
+      Yeni Fotoğraf Çek
+    </button>
+  </div>
+
+  <!-- ③ SOHBET -->
+  <div id="chat-section">
+    <div class="chat-header">
+      <div class="step-label">💬 Adım 3 — Soru Sor</div>
+      <button id="clear-chat-btn" onclick="clearChat()">🗑 Sohbeti Temizle</button>
+    </div>
+    <div id="messages"></div>
+
+    <button class="btn" id="voice-btn" onclick="toggleVoice()">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+      </svg>
+      <span id="voice-label">Sesli Soru Sor</span>
+    </button>
+    <div id="voice-status"></div>
+    <div id="input-row">
+      <input type="text" id="text-q" placeholder="Sorunuzu buraya yazın…" />
+      <button id="text-send" onclick="sendText()">➤</button>
+    </div>
+  </div>
+
+</main>
+<div id="toast"></div>
+
+<footer style="width:100%;text-align:center;padding:18px 16px;font-family:'Nunito',sans-serif;font-size:.82rem;color:#5A6575;border-top:1px solid #D8DCE4;background:#ECEEF2;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;">
+  <span>© 2026 Yardımcı Göz</span>
+  <span style="color:#D8DCE4;">·</span>
+  <a href="https://github.com/kullaniciadi/yardimci-goz" target="_blank" rel="noopener"
+     style="color:#34568B;text-decoration:none;font-weight:700;display:inline-flex;align-items:center;gap:5px;"
+     onmouseover="this.style.color='#2C3E50'" onmouseout="this.style.color='#34568B'">
+    <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+    </svg>
+    GitHub — Dokümantasyon
+  </a>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
+<script>
+// ─────────────────────────────────────────
+//  DURUM
+// ─────────────────────────────────────────
+const S = {
+  ocrText:       '',
+  summary:       '',
+  history:       [],
+  activeSpeakId: null,   // şu an konuşan bubble id
+  recognition:   null,
+  recording:     false,
+  bubbleIdx:     0,
+  mainSpeaking:  false,  // özet TTS durumu
+};
+
+const PROXY = 'proxy.php';
+
+const SYSTEM_PROMPT = `Sen yaşlı bireylere yardım eden, sabırlı ve nazik bir belge asistanısın. Adın "Yardımcı Göz".
+Görevin:
+1. Verilen belge metnini ÇOK SADE Türkçeyle özetlemek.
+2. Varsa önemli tarihleri, son ödeme ve başvuru günlerini belirtmek.
+3. Risk veya ceza varsa 🔴 ile işaretlemek.
+4. Kullanıcı soru sorarsa yalnızca belge içeriğine dayanarak cevap vermek.
+Teknik terim kullanma. Kısa ve anlaşılır ol.`;
+
+// ─────────────────────────────────────────
+//  YAZI BOYUTU
+// ─────────────────────────────────────────
+const fontClasses = ['', 'text-lg', 'text-xl'];
+function setFont(idx) {
+  document.body.classList.remove('text-lg', 'text-xl');
+  if (fontClasses[idx]) document.body.classList.add(fontClasses[idx]);
+  document.querySelectorAll('.font-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+}
+
+// ─────────────────────────────────────────
+//  MODAL
+// ─────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ─────────────────────────────────────────
+//  LİGHTBOX
+// ─────────────────────────────────────────
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+
+function handlePreviewClick() {
+  const img = document.getElementById('preview-img');
+  if (img.style.display !== 'none' && img.src) {
+    openLightbox(img.src);
+  } else {
+    openCamera();
+  }
+}
+
+// ─────────────────────────────────────────
+//  KAMERA
+// ─────────────────────────────────────────
+function openCamera() { document.getElementById('file-input').click(); }
+
+document.getElementById('file-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    showPreview(ev.target.result);
+    document.getElementById('welcome').style.display = 'none';
+    runOCR(ev.target.result);
+  };
+  reader.readAsDataURL(file);
+  this.value = '';
+});
+
+function showPreview(src) {
+  const img = document.getElementById('preview-img');
+  img.src = src;
+  img.style.display = 'block';
+  document.getElementById('preview-placeholder').style.display = 'none';
+  document.getElementById('preview-box').classList.add('has-image');
+}
+
+// ─────────────────────────────────────────
+//  OCR — Tesseract.js
+// ─────────────────────────────────────────
+async function runOCR(dataUrl) {
+  const bar  = document.getElementById('status-bar');
+  const msg  = document.getElementById('status-msg');
+  const fill = document.getElementById('progress-fill');
+  bar.classList.add('visible');
+  document.getElementById('capture-btn').disabled = true;
+
+  try {
+    const result = await Tesseract.recognize(dataUrl, 'tur+eng', {
+      logger: m => {
+        if (m.status === 'recognizing text') {
+          const p = Math.round((m.progress || 0) * 100);
+          fill.style.width = p + '%';
+          msg.textContent  = `🔍 Yazılar okunuyor… %${p}`;
+        }
+      },
+    });
+
+    S.ocrText = result.data.text.trim();
+    fill.style.width = '100%';
+    msg.textContent  = '✅ Okundu, özetleniyor…';
+
+    if (!S.ocrText) {
+      showToast('Fotoğraftan metin çıkarılamadı. Daha net çekin.');
+      bar.classList.remove('visible');
+      document.getElementById('capture-btn').disabled = false;
+      return;
+    }
+    await summarize();
+  } catch (err) {
+    showToast('OCR hatası: ' + err.message);
+    bar.classList.remove('visible');
+    document.getElementById('capture-btn').disabled = false;
+  }
+}
+
+// ─────────────────────────────────────────
+//  GROQ — ÖZETLEME
+// ─────────────────────────────────────────
+async function summarize() {
+  const card = document.getElementById('description-card');
+  const el   = document.getElementById('description-text');
+  card.classList.add('visible');
+  el.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+
+  try {
+    const answer = await callGroq([
+      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'user',   content: 'Aşağıdaki belgeyi özetle:\n\n' + S.ocrText },
+    ], 1024, 0.3);
+
+    S.summary = answer;
+    S.history  = [{ role: 'assistant', content: answer }];
+    el.textContent = answer;
+
+    document.getElementById('status-bar').classList.remove('visible');
+    document.getElementById('capture-btn').disabled = false;
+    document.getElementById('new-photo-btn').classList.add('visible');
+    document.getElementById('chat-section').classList.add('visible');
+
+    // Özeti otomatik seslendir (sadece özet için)
+    speakMain(answer);
+
+  } catch (err) {
+    el.textContent = 'Özetleme sırasında hata oluştu.';
+    showToast(err.message);
+    document.getElementById('status-bar').classList.remove('visible');
+    document.getElementById('capture-btn').disabled = false;
+  }
+}
+
+// ─────────────────────────────────────────
+//  GROQ — SORU-CEVAP
+// ─────────────────────────────────────────
+async function askGroq(question) {
+  S.history.push({ role: 'user', content: question });
+  const answer = await callGroq([
+    { role: 'system', content: SYSTEM_PROMPT + '\n\n--- BELGE ---\n' + S.ocrText + '\n--- SON ---' },
+    ...S.history,
+  ], 512, 0.4);
+  S.history.push({ role: 'assistant', content: answer });
+  return answer;
+}
+
+// ─────────────────────────────────────────
+//  GROQ — ORTAK FETCH
+// ─────────────────────────────────────────
+async function callGroq(messages, maxTokens = 1024, temperature = 0.35) {
+  const res = await fetch(PROXY, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages, max_tokens: maxTokens, temperature }),
+  });
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({}));
+    throw new Error(e.error || 'Groq hatası (HTTP ' + res.status + ')');
+  }
+  const data = await res.json();
+  return data.choices[0].message.content.trim();
+}
+
+// ─────────────────────────────────────────
+//  TTS — Web Speech API (iyileştirilmiş)
+// ─────────────────────────────────────────
+function getBestVoice() {
+  const voices = speechSynthesis.getVoices();
+  // Önce Türkçe online sesleri dene (çok daha doğal)
+  const priority = [
+    v => v.lang === 'tr-TR' && !v.localService,
+    v => v.lang === 'tr-TR',
+    v => v.lang.startsWith('tr'),
+  ];
+  for (const check of priority) {
+    const found = voices.find(check);
+    if (found) return found;
+  }
+  return null;
+}
+
+function speakText(text, onEnd) {
+  stopAllSpeech();
+  if (!text || !window.speechSynthesis) return;
+
+  const utt    = new SpeechSynthesisUtterance(text);
+  utt.lang     = 'tr-TR';
+  utt.rate     = 0.82;   // biraz daha yavaş = daha anlaşılır
+  utt.pitch    = 1.0;
+  utt.volume   = 1.0;
+  const voice  = getBestVoice();
+  if (voice) utt.voice = voice;
+
+  utt.onend   = () => { if (onEnd) onEnd(); };
+  utt.onerror = () => { if (onEnd) onEnd(); };
+
+  speechSynthesis.speak(utt);
+}
+
+function stopAllSpeech() {
+  speechSynthesis.cancel();
+  // Tüm bubble speak butonlarını sıfırla
+  document.querySelectorAll('.bubble-speak').forEach(b => {
+    b.classList.remove('playing');
+    b.textContent = '🔊 Dinle';
+  });
+  // Özet butonunu sıfırla
+  setMainTTSOff();
+  S.activeSpeakId = null;
+}
+
+// Özet TTS
+function speakMain(text) {
+  speakText(text, () => setMainTTSOff());
+  S.mainSpeaking = true;
+  document.getElementById('tts-btn').classList.add('speaking');
+  document.getElementById('tts-label').textContent = 'Durdurmak İçin Bas';
+}
+
+function setMainTTSOff() {
+  S.mainSpeaking = false;
+  document.getElementById('tts-btn')?.classList.remove('speaking');
+  const lbl = document.getElementById('tts-label');
+  if (lbl) lbl.textContent = 'Sesli Dinle';
+}
+
+function toggleMainTTS() {
+  if (S.mainSpeaking) {
+    stopAllSpeech();
+  } else {
+    stopAllSpeech();
+    speakMain(S.summary);
+  }
+}
+
+// Bubble TTS — sohbette manuel, otomatik değil
+function toggleBubbleSpeak(id, text, btn) {
+  if (S.activeSpeakId === id) {
+    stopAllSpeech();
+    return;
+  }
+  stopAllSpeech();
+  S.activeSpeakId = id;
+  btn.classList.add('playing');
+  btn.textContent = '⏹ Durdur';
+  speakText(text, () => {
+    btn.classList.remove('playing');
+    btn.textContent = '🔊 Dinle';
+    if (S.activeSpeakId === id) S.activeSpeakId = null;
+  });
+}
+
+speechSynthesis.onvoiceschanged = () => {};
+
+// ─────────────────────────────────────────
+//  STT — Web Speech API
+// ─────────────────────────────────────────
+function toggleVoice() {
+  if (S.recording) {
+    S.recognition?.stop();
+    setRecOff();
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    showToast('Tarayıcınız ses tanımayı desteklemiyor. Lütfen yazarak sorun.');
+    return;
+  }
+  stopAllSpeech();
+  const rec = new SR();
+  rec.lang  = 'tr-TR';
+  rec.maxAlternatives = 1;
+  rec.onresult = e => {
+    const t = e.results[0][0].transcript;
+    document.getElementById('voice-status').textContent = '✔ ' + t;
+    handleQuestion(t);
+  };
+  rec.onerror = () => { showToast('Ses algılanamadı.'); setRecOff(); };
+  rec.onend   = () => setRecOff();
+  S.recognition = rec;
+  rec.start();
+  S.recording = true;
+  document.getElementById('voice-btn').classList.add('recording');
+  document.getElementById('voice-label').textContent = 'Dinleniyor… Durdurmak için bas';
+  document.getElementById('voice-status').textContent = '🎙️ Konuşun…';
+}
+
+function setRecOff() {
+  S.recording = false;
+  document.getElementById('voice-btn').classList.remove('recording');
+  document.getElementById('voice-label').textContent = 'Sesli Soru Sor';
+}
+
+// ─────────────────────────────────────────
+//  METİN GİRİŞİ
+// ─────────────────────────────────────────
+function sendText() {
+  const inp = document.getElementById('text-q');
+  const q   = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+  handleQuestion(q);
+}
+document.getElementById('text-q').addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendText();
+});
+
+// ─────────────────────────────────────────
+//  SORU İŞLEME
+// ─────────────────────────────────────────
+async function handleQuestion(q) {
+  document.getElementById('voice-status').textContent = '';
+  addBubble('user', q);
+  const thinkId = addBubble('ai', '<div class="dots"><span></span><span></span><span></span></div>', true);
+
+  try {
+    const answer = await askGroq(q);
+    updateBubble(thinkId, answer);  // otomatik seslendirme YOK — kullanıcı "Dinle" butonuna basar
+  } catch (err) {
+    updateBubble(thinkId, 'Bir hata oluştu: ' + err.message);
+    showToast(err.message);
+  }
+}
+
+// ─────────────────────────────────────────
+//  BUBBLE YARDIMCILARI
+// ─────────────────────────────────────────
+function addBubble(type, content, isRaw = false) {
+  const id   = 'b' + (++S.bubbleIdx);
+  const msgs = document.getElementById('messages');
+  const el   = document.createElement('div');
+  el.className = 'bubble ' + type;
+  el.id        = id;
+  el.innerHTML = `<div class="who">${type === 'ai' ? '👁️ Yardımcı Göz' : '🧑 Siz'}</div>`
+               + (isRaw ? content : esc(content));
+  msgs.appendChild(el);
+  el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  return id;
+}
+
+function updateBubble(id, text) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const safeText = JSON.stringify(text);
+  el.innerHTML = `<div class="who">👁️ Yardımcı Göz</div>${esc(text)}`
+    + `<button class="bubble-speak" id="spk-${id}" onclick="toggleBubbleSpeak('${id}',${safeText},this)">🔊 Dinle</button>`;
+  el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─────────────────────────────────────────
+//  SOHBET TEMİZLE
+// ─────────────────────────────────────────
+function clearChat() {
+  stopAllSpeech();
+  S.history    = S.history.slice(0, 1); // ilk asistan mesajını koru
+  S.bubbleIdx  = 0;
+  document.getElementById('messages').innerHTML = '';
+  document.getElementById('voice-status').textContent = '';
+}
+
+// ─────────────────────────────────────────
+//  SIFIRLAMA
+// ─────────────────────────────────────────
+function resetApp() {
+  stopAllSpeech();
+  S.recognition?.stop();
+  Object.assign(S, { ocrText:'', summary:'', history:[], recording:false, bubbleIdx:0, activeSpeakId:null, mainSpeaking:false });
+
+  const img = document.getElementById('preview-img');
+  img.src = ''; img.style.display = 'none';
+  document.getElementById('preview-placeholder').style.display = 'flex';
+  document.getElementById('preview-box').classList.remove('has-image');
+  document.getElementById('description-card').classList.remove('visible');
+  document.getElementById('description-text').textContent = '';
+  document.getElementById('new-photo-btn').classList.remove('visible');
+  document.getElementById('chat-section').classList.remove('visible');
+  document.getElementById('messages').innerHTML = '';
+  document.getElementById('status-bar').classList.remove('visible');
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('voice-status').textContent = '';
+  document.getElementById('capture-btn').disabled = false;
+  document.getElementById('welcome').style.display = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─────────────────────────────────────────
+//  TOAST
+// ─────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3800);
+}
+</script>
+</body>
+</html>
