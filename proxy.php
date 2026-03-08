@@ -1,9 +1,4 @@
 <?php
-// ─────────────────────────────────────────────
-//  GÖZÜM — Groq API Proxy
-//  index.html buraya POST atar, buradan Groq'a iletilir
-//  API anahtarı hiçbir zaman tarayıcıya gitmez
-// ─────────────────────────────────────────────
 
 require_once 'config.php';
 
@@ -13,20 +8,20 @@ header('Access-Control-Allow-Origin: '  . ALLOWED_ORIGIN);
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// Preflight isteğini geç
+// Preflight isteğini geçme
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
     exit;
 }
 
-// Sadece POST kabul et
+// Sadece POST kabul etme
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['error' => 'Sadece POST isteği kabul edilir.']);
     exit;
 }
 
-// Gelen JSON'u oku
+// Gelen JSON'u okuma
 $body = file_get_contents('php://input');
 $data = json_decode($body, true);
 
@@ -36,7 +31,7 @@ if (!$data || empty($data['messages'])) {
     exit;
 }
 
-// ── Groq'a gönderilecek payload ──────────────
+// Gönderilecek Payload
 $payload = json_encode([
     'model'       => GROQ_MODEL,
     'messages'    => $data['messages'],
@@ -44,7 +39,7 @@ $payload = json_encode([
     'max_tokens'  => isset($data['max_tokens'])  ? (int)$data['max_tokens']    : 1024,
 ]);
 
-// ── cURL ile Groq API çağrısı ─────────────────
+// cURL API Çağrısı
 $ch = curl_init(GROQ_API_URL);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
@@ -62,13 +57,13 @@ $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $curlError = curl_error($ch);
 curl_close($ch);
 
-// ── Hata kontrolü ─────────────────────────────
+// Hata Kontrolü
 if ($curlError) {
     http_response_code(502);
     echo json_encode(['error' => 'Groq bağlantı hatası: ' . $curlError]);
     exit;
 }
 
-// Groq'tan gelen cevabı olduğu gibi ilet
+// Cevabı İletme
 http_response_code($httpCode);
 echo $response;
