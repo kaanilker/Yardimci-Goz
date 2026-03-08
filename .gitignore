@@ -1,18 +1,34 @@
+# API keys and sensitive config — never commit
 config.php
 
+# Environment files
+.env
+.env.*
+
+# PHP / Composer
+vendor/
+composer.lock
+
+# Editor and OS junk
 .DS_Store
 Thumbs.db
 desktop.ini
-
-.vscode/
 .idea/
+.vscode/
 *.swp
 *.swo
 *~
 
+# Logs and temp files
 *.log
-*.tmp
-*.cache
+/logs/
+/tmp/
 
-error_log
-php_errorlog
+# Build / cache artifacts
+/cache/
+/.cache/
+
+# Node (if tooling is ever added)
+node_modules/
+npm-debug.log*
+yarn-error.log*
