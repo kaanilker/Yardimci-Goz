@@ -4,59 +4,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>Yardımcı Göz – Belge Asistanın</title>
+  <link rel="icon" type="image/png" href="resim.png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet" />
   <style>
-    /* ═══════════════════════════════════════════════════
-       TEMA — Toplumsal Fayda Paleti
-    ═══════════════════════════════════════════════════ */
     :root {
-      /* Zemin & Yüzeyler */
       --bg:          #F4F5F7;
       --surface:     #FFFFFF;
       --warm:        #ECEEF2;
       --border:      #D8DCE4;
-
-      /* Marka — Bilimsel Güven Mavisi */
       --brand:       #2C3E50;
       --brand-h:     #1e2d3d;
       --brand-s:     #34568B;
-
-      /* Vurgu — Adaçayı / Toplum Yeşili */
       --green:       #5B8A72;
       --green-h:     #3d6b55;
       --green-s:     #e8f2ec;
-
-      /* Aksiyon — Sıcak Kiremit */
       --action:      #D96C5B;
       --action-h:    #be5545;
       --action-s:    #fdf0ee;
-
-      /* Metin */
       --text:        #1A1A1A;
       --muted:       #5A6575;
       --muted-s:     #8A97A8;
-
-      /* Sohbet baloncukları */
       --ai-bg:       #F0F4F8;
       --user-bg:     #EAF2EE;
-
-      /* Gölgeler — flat design, hafif tutuldu */
       --shadow-sm:   0 1px 4px rgba(44,62,80,.07);
       --shadow-md:   0 3px 14px rgba(44,62,80,.10);
       --shadow-lg:   0 8px 30px rgba(44,62,80,.13);
-
-      /* Hata */
       --red:         #C0392B;
       --red-h:       #a02d21;
-
       --r:           16px;
       --font-base:   18px;
     }
 
-    /* Yazı boyutu kademeleri */
-    body.text-lg  { --font-base: 21px; }
-    body.text-xl  { --font-base: 25px; }
+    html.text-md  { font-size: 17px; }
+    html.text-lg  { font-size: 21px; }
+    html.text-xl  { font-size: 25px; }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -71,7 +53,6 @@
       align-items: center;
     }
 
-    /* ── HEADER ─────────────────────────────── */
     header {
       width: 100%;
       background: var(--brand);
@@ -84,25 +65,16 @@
       top: 0;
       z-index: 200;
     }
-    .header-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .header-logo { display: flex; align-items: center; gap: 10px; }
     .header-logo h1 {
       font-family: 'Playfair Display', serif;
       font-size: 1.65rem;
       color: #fff;
       letter-spacing: .5px;
     }
-    .header-logo p {
-      font-size: .8rem;
-      color: rgba(255,255,255,.65);
-      margin-top: 1px;
-    }
+    .header-logo p { font-size: .8rem; color: rgba(255,255,255,.65); margin-top: 1px; }
     .header-actions { display: flex; gap: 8px; align-items: center; }
 
-    /* Yazı boyutu butonları */
     .font-btns {
       display: flex;
       gap: 4px;
@@ -128,7 +100,6 @@
     .font-btn.large  { font-size: 1.15rem; }
     .font-btn.xlarge { font-size: 1.35rem; }
 
-    /* Hakkında butonu */
     #about-btn {
       background: rgba(255,255,255,.18);
       border: 1.5px solid rgba(255,255,255,.4);
@@ -146,7 +117,6 @@
     }
     #about-btn:hover { background: rgba(255,255,255,.28); }
 
-    /* ── MODAL ──────────────────────────────── */
     .modal-backdrop {
       position: fixed; inset: 0;
       background: rgba(46,31,14,.55);
@@ -179,18 +149,8 @@
       align-items: center;
       gap: 10px;
     }
-    .modal p {
-      font-size: .95rem;
-      color: var(--muted);
-      line-height: 1.75;
-      margin-bottom: 14px;
-    }
-    .modal .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 14px 0;
-    }
+    .modal p { font-size: .95rem; color: var(--muted); line-height: 1.75; margin-bottom: 14px; }
+    .modal .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
     .tag {
       background: var(--warm);
       color: var(--brand);
@@ -216,35 +176,32 @@
     }
     .modal-close:hover { background: var(--border); }
 
-    /* ── ANA İÇERİK ─────────────────────────── */
     main {
       width: 100%;
       max-width: 540px;
-      padding: 22px 16px 80px;
+      padding: 14px 16px 24px;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 12px;
     }
 
-    /* ── HOŞGELDİN KARTI ────────────────────── */
     #welcome {
       background: var(--surface);
       border-radius: var(--r);
-      padding: 28px 24px;
+      padding: 16px 20px;
       text-align: center;
       box-shadow: var(--shadow-md);
       border: 1.5px solid var(--border);
     }
-    #welcome .emoji { font-size: 3rem; margin-bottom: 10px; }
+    #welcome .emoji { font-size: 2rem; margin-bottom: 6px; }
     #welcome h2 {
       font-family: 'Playfair Display', serif;
-      font-size: 1.45rem;
+      font-size: 1.2rem;
       color: var(--brand);
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
-    #welcome p { font-size: .95rem; color: var(--muted); line-height: 1.7; }
+    #welcome p { font-size: .88rem; color: var(--muted); line-height: 1.6; }
 
-    /* ── ADIM ETİKETİ ───────────────────────── */
     .step-label {
       font-size: .78rem;
       font-weight: 900;
@@ -254,10 +211,10 @@
       padding-left: 2px;
     }
 
-    /* ── ÖNCE GÖRSELİ ───────────────────────── */
     #preview-box {
       width: 100%;
-      aspect-ratio: 4/3;
+      aspect-ratio: 16/9;
+      max-height: 42dvh;
       border-radius: var(--r);
       overflow: hidden;
       background: var(--warm);
@@ -274,9 +231,7 @@
       width: 100%; height: 100%;
       object-fit: cover;
       display: none;
-      transition: transform .3s;
     }
-    /* Lightbox — fotoğrafa tıklayınca büyüt */
     #preview-box.has-image #preview-img { cursor: zoom-in; }
 
     #preview-placeholder {
@@ -289,7 +244,6 @@
     }
     #preview-placeholder span { font-size: 1rem; font-weight: 700; }
 
-    /* ── LİGHTBOX ───────────────────────────── */
     #lightbox {
       position: fixed; inset: 0;
       background: rgba(0,0,0,.88);
@@ -308,8 +262,7 @@
       box-shadow: 0 0 60px rgba(0,0,0,.6);
     }
 
-    /* ── BUTONLAR ───────────────────────────── */
-    #file-input { display: none; }
+    #file-input-gallery, #file-input-camera { display: none; }
 
     .btn {
       width: 100%;
@@ -366,7 +319,6 @@
     .outline-btn.visible { display: flex; }
     .outline-btn:active  { background: var(--warm); transform: scale(.97); }
 
-    /* ── DURUM ÇUBUĞU ───────────────────────── */
     #status-bar { display: none; flex-direction: column; gap: 8px; }
     #status-bar.visible { display: flex; }
     #status-msg { font-size: .95rem; font-weight: 700; color: var(--brand); }
@@ -383,7 +335,6 @@
       transition: width .4s ease;
     }
 
-    /* ── AÇIKLAMA KARTI ─────────────────────── */
     #description-card {
       background: var(--surface);
       border-radius: var(--r);
@@ -396,11 +347,7 @@
     }
     #description-card.visible { display: flex; }
 
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .card-header { display: flex; align-items: center; justify-content: space-between; }
     .card-title {
       font-size: .78rem;
       font-weight: 900;
@@ -416,7 +363,8 @@
       white-space: pre-wrap;
     }
 
-    /* TTS butonu — özet için */
+    #description-text strong, .bubble strong { font-weight: 900; }
+
     #tts-btn {
       width: 100%;
       padding: 13px 0;
@@ -438,7 +386,6 @@
     #tts-btn:active   { transform: scale(.97); }
     #tts-btn.speaking { background: var(--green); color: #fff; border-color: var(--green-h); }
 
-    /* ── YÜKLEME ANİMASYONU ─────────────────── */
     .dots { display: flex; gap: 7px; align-items: center; padding: 6px 0; }
     .dots span {
       width: 11px; height: 11px;
@@ -453,15 +400,10 @@
       40%          { transform: scale(1.1); opacity: 1; }
     }
 
-    /* ── SOHBET ─────────────────────────────── */
     #chat-section { display: none; flex-direction: column; gap: 14px; }
     #chat-section.visible { display: flex; }
 
-    .chat-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .chat-header { display: flex; align-items: center; justify-content: space-between; }
     #clear-chat-btn {
       background: none;
       border: 1.5px solid var(--border);
@@ -524,7 +466,6 @@
     .bubble-speak:hover   { background: var(--green-s); }
     .bubble-speak.playing { background: var(--green); color: #fff; border-color: var(--green-h); }
 
-    /* ── GİRİŞ ALANI ────────────────────────── */
     #voice-status {
       font-size: .9rem;
       font-weight: 700;
@@ -559,12 +500,6 @@
     }
     #text-send:active { transform: scale(.93); background: var(--action-h); }
 
-    /* ── LIGHTBOX ───────────────────────────── */
-    #lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.88); z-index: 800; display: none; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; }
-    #lightbox.open { display: flex; }
-    #lightbox img  { max-width: 100%; max-height: 90dvh; border-radius: 12px; }
-
-    /* ── TOAST ──────────────────────────────── */
     #toast {
       position: fixed;
       bottom: 24px; left: 50%;
@@ -586,7 +521,6 @@
 </head>
 <body>
 
-<!-- ── HEADER ── -->
 <header>
   <div class="header-logo">
     <svg width="28" height="28" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24">
@@ -608,7 +542,7 @@
   </div>
 </header>
 
-<!-- ── HAKKINDA MODAL ── -->
+<!-- Hakkında Kısmı -->
 <div class="modal-backdrop" id="about-modal" onclick="closeModal('about-modal')">
   <div class="modal" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="closeModal('about-modal')">✕</button>
@@ -624,43 +558,62 @@
     </p>
     <p><strong>Nasıl çalışır?</strong></p>
     <p>
-      1. Belgeyi fotoğraflayın.<br/>
-      2. Yazılar otomatik olarak okunur (OCR).<br/>
+      1. Fotoğraf Çek butonuna basın veya galeriden seçin.<br/>
+      2. Tesseract.js yazıları otomatik olarak okur (OCR).<br/>
       3. Yapay zeka belgeyi sade Türkçeyle özetler.<br/>
-      4. Sesli dinleyin veya sorularınızı sorun.
+      4. Özeti sesli dinleyin veya sorularınızı yazın / sesli sorun.
     </p>
     <p><strong>Kullanılan teknolojiler:</strong></p>
     <div class="tag-row">
       <span class="tag">Tesseract.js (OCR)</span>
       <span class="tag">Groq API</span>
-      <span class="tag">Llama 3.1 8B</span>
+      <span class="tag">Llama 3.1 8B Instant</span>
+      <span class="tag">Microsoft Edge TTS</span>
       <span class="tag">Web Speech API</span>
       <span class="tag">PHP</span>
       <span class="tag">HTML / CSS / JS</span>
     </div>
     <p style="font-size:.82rem; color:var(--muted); margin-top:6px;">
       Tüm işlemler tarayıcınızda veya güvenli sunucumuzda gerçekleşir.
-      Fotoğraflarınız kaydedilmez.
+      Fotoğraflarınız hiçbir şekilde kaydedilmez veya paylaşılmaz.
     </p>
   </div>
 </div>
 
-<!-- ── LİGHTBOX ── -->
+<!-- Kalite Uyarısı -->
+<div class="modal-backdrop" id="quality-modal">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2 style="font-size:1.3rem;">⚠️ Metin Kalitesi Düşük</h2>
+    <p>Fotoğraftaki yazılar net okunamadı. Özet yanlış veya eksik olabilir.</p>
+    <p>Daha iyi sonuç için:</p>
+    <p>• Belgeyi düz ve aydınlık bir yerde çekin<br/>• Kamerayı yaklaştırın<br/>• Bulanık veya gölgeli fotoğraflardan kaçının</p>
+    <div style="display:flex;gap:10px;margin-top:6px;">
+      <button onclick="qualityCancel()" style="flex:1;padding:13px;border-radius:12px;border:2px solid var(--border);background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;color:var(--muted);cursor:pointer;">
+        Yeni Fotoğraf Çek
+      </button>
+      <button onclick="qualityContinue()" style="flex:1;padding:13px;border-radius:12px;border:none;background:var(--action);color:#fff;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;">
+        Yine de Devam Et
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="lightbox" onclick="closeLightbox()">
   <img id="lightbox-img" alt="Büyük görüntü" />
 </div>
 
 <main>
 
-  <!-- HOŞGELDİN -->
   <div id="welcome">
     <div class="emoji">👴👵</div>
     <h2>Hoş Geldiniz!</h2>
     <p>Anlamakta zorlandığınız bir belge mi var?<br/>Fotoğrafını çekin, size kolayca açıklayalım.</p>
   </div>
 
-  <!-- ① KAMERA -->
-  <div class="step-label">📷 Adım 1 — Fotoğraf Çek</div>
+  <div class="step-label">📷 Adım 1 — Fotoğraf Seç</div>
+
+  <input type="file" id="file-input-gallery" accept="image/*" />
+  <input type="file" id="file-input-camera"  accept="image/*" capture="environment" />
 
   <div id="preview-box" onclick="handlePreviewClick()">
     <img id="preview-img" alt="Çekilen fotoğraf" />
@@ -669,13 +622,11 @@
         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
         <circle cx="12" cy="13" r="4"/>
       </svg>
-      <span>Fotoğraf çekmek için buraya dokun</span>
+      <span>Fotoğraf seçmek için buraya dokun</span>
     </div>
   </div>
 
-  <input type="file" id="file-input" accept="image/*" capture="environment" />
-
-  <button class="btn" id="capture-btn" onclick="openCamera()">
+  <button class="btn" id="capture-btn" onclick="openCameraInput()">
     <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
       <circle cx="12" cy="13" r="4"/>
@@ -683,13 +634,11 @@
     Fotoğraf Çek
   </button>
 
-  <!-- OCR ilerleme -->
   <div id="status-bar">
     <div id="status-msg">🔍 Yazılar okunuyor…</div>
     <div id="progress-track"><div id="progress-fill"></div></div>
   </div>
 
-  <!-- ② ÖZET -->
   <div id="description-card">
     <div class="card-header">
       <div class="card-title">📋 Belge Özeti</div>
@@ -711,7 +660,6 @@
     </button>
   </div>
 
-  <!-- ③ SOHBET -->
   <div id="chat-section">
     <div class="chat-header">
       <div class="step-label">💬 Adım 3 — Soru Sor</div>
@@ -736,66 +684,80 @@
 </main>
 <div id="toast"></div>
 
-<footer style="width:100%;text-align:center;padding:18px 16px;font-family:'Nunito',sans-serif;font-size:.82rem;color:#5A6575;border-top:1px solid #D8DCE4;background:#ECEEF2;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;">
-  <span>© 2026 Yardımcı Göz</span>
+<footer style="width:100%;text-align:center;padding:10px 16px;font-family:'Nunito',sans-serif;font-size:.82rem;color:#5A6575;border-top:1px solid #D8DCE4;background:#ECEEF2;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
+  <span>Yardımcı Göz by Kaan İlker</span>
   <span style="color:#D8DCE4;">·</span>
-  <a href="https://github.com/kullaniciadi/yardimci-goz" target="_blank" rel="noopener"
+  <a href="https://github.com/kaanilker/yardimci-goz" target="_blank" rel="noopener"
      style="color:#34568B;text-decoration:none;font-weight:700;display:inline-flex;align-items:center;gap:5px;"
      onmouseover="this.style.color='#2C3E50'" onmouseout="this.style.color='#34568B'">
     <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24">
       <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
     </svg>
-    GitHub — Dokümantasyon
+    GitHub Kaynak Kodları
   </a>
 </footer>
 
-<!-- ═══════════════════════════════════════════
-     JAVASCRIPT
-═══════════════════════════════════════════ -->
 <script>
-// ─────────────────────────────────────────
-//  DURUM
-// ─────────────────────────────────────────
+
+// Durum
 const S = {
   ocrText:       '',
   summary:       '',
   history:       [],
-  activeSpeakId: null,   // şu an konuşan bubble id
+  activeSpeakId: null,
   recognition:   null,
   recording:     false,
   bubbleIdx:     0,
-  mainSpeaking:  false,  // özet TTS durumu
+  mainSpeaking:  false,
+  ttsMode:       'edge',
 };
 
-const PROXY = 'proxy.php';
+const PROXY     = 'proxy.php';
+const TTS_PROXY = 'tts-proxy.php';
+const ttsCache  = {};
+let   currentAudio = null;
 
 const SYSTEM_PROMPT = `Sen yaşlı bireylere yardım eden, sabırlı ve nazik bir belge asistanısın. Adın "Yardımcı Göz".
 Görevin:
 1. Verilen belge metnini ÇOK SADE Türkçeyle özetlemek.
 2. Varsa önemli tarihleri, son ödeme ve başvuru günlerini belirtmek.
 3. Risk veya ceza varsa 🔴 ile işaretlemek.
-4. Kullanıcı soru sorarsa yalnızca belge içeriğine dayanarak cevap vermek.
-Teknik terim kullanma. Kısa ve anlaşılır ol.`;
+4. Kafa karışıklığı yaratmadan düzgünce ve Türkçe açıklamak.
+5. Metne başlarken "Belge şunu anlatıyor:" diyerekten başla.
+6. Göz karıştırıcı şeyler kullanma.
+Teknik terim kullanma. Kısa ve anlaşılır ol. Önemli kelimeleri **kalın** yap.`;
 
-// ─────────────────────────────────────────
-//  YAZI BOYUTU
-// ─────────────────────────────────────────
-const fontClasses = ['', 'text-lg', 'text-xl'];
-function setFont(idx) {
-  document.body.classList.remove('text-lg', 'text-xl');
-  if (fontClasses[idx]) document.body.classList.add(fontClasses[idx]);
-  document.querySelectorAll('.font-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+const SYSTEM_PROMPT_CHAT = `Sen yaşlı bireylere yardım eden, sabırlı ve nazik bir belge asistanısın. Adın "Yardımcı Göz".
+Görevin:
+1. Kişinin sorduğu sorulara veya açıklamanı istediği yerlere ÇOK SADE TÜrkçeyle cevap vermek.
+2. Önemli olan yerleri belirtmek.
+3. Terimler kullanma ve basit cümleler kur.
+4. Kullanıcı soru sorarsa yalnızca belge içeriğine dayanarak cevap vermek.`;
+
+function renderMd(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 }
 
-// ─────────────────────────────────────────
-//  MODAL
-// ─────────────────────────────────────────
+// Yazı Boyutu Ayarlama
+const fontClasses = ['text-md', 'text-lg', 'text-xl'];
+function setFont(idx) {
+  document.documentElement.classList.remove('text-md', 'text-lg', 'text-xl');
+  document.documentElement.classList.add(fontClasses[idx]);
+  document.querySelectorAll('.font-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  localStorage.setItem('yg-font', idx);
+}
+(function() {
+  const saved = localStorage.getItem('yg-font');
+  setFont(saved !== null ? parseInt(saved) : 0);
+})();
+
+// Light Box
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-// ─────────────────────────────────────────
-//  LİGHTBOX
-// ─────────────────────────────────────────
 function openLightbox(src) {
   document.getElementById('lightbox-img').src = src;
   document.getElementById('lightbox').classList.add('open');
@@ -804,19 +766,15 @@ function closeLightbox() { document.getElementById('lightbox').classList.remove(
 
 function handlePreviewClick() {
   const img = document.getElementById('preview-img');
-  if (img.style.display !== 'none' && img.src) {
-    openLightbox(img.src);
-  } else {
-    openCamera();
-  }
+  if (img.style.display !== 'none' && img.src) openLightbox(img.src);
+  else openGalleryInput();
 }
 
-// ─────────────────────────────────────────
-//  KAMERA
-// ─────────────────────────────────────────
-function openCamera() { document.getElementById('file-input').click(); }
+function openCameraInput()  { document.getElementById('file-input-camera').click(); }
+function openGalleryInput() { document.getElementById('file-input-gallery').click(); }
 
-document.getElementById('file-input').addEventListener('change', function(e) {
+// Dosya Seçimi
+function onFileSelected(e) {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
@@ -826,8 +784,11 @@ document.getElementById('file-input').addEventListener('change', function(e) {
     runOCR(ev.target.result);
   };
   reader.readAsDataURL(file);
-  this.value = '';
-});
+  e.target.value = '';
+}
+
+document.getElementById('file-input-gallery').addEventListener('change', onFileSelected);
+document.getElementById('file-input-camera').addEventListener('change',  onFileSelected);
 
 function showPreview(src) {
   const img = document.getElementById('preview-img');
@@ -837,15 +798,32 @@ function showPreview(src) {
   document.getElementById('preview-box').classList.add('has-image');
 }
 
-// ─────────────────────────────────────────
-//  OCR — Tesseract.js
-// ─────────────────────────────────────────
+// Kalite Uyarısı
+let qualityCallback = null;
+function showQualityWarning(onContinue) {
+  qualityCallback = onContinue;
+  document.getElementById('status-bar').classList.remove('visible');
+  openModal('quality-modal');
+}
+function qualityContinue() {
+  closeModal('quality-modal');
+  if (qualityCallback) { qualityCallback(); qualityCallback = null; }
+}
+function qualityCancel() {
+  closeModal('quality-modal');
+  qualityCallback = null;
+  resetApp();
+}
+
+// Görüntüyü Metne Çevirme
 async function runOCR(dataUrl) {
-  const bar  = document.getElementById('status-bar');
-  const msg  = document.getElementById('status-msg');
-  const fill = document.getElementById('progress-fill');
+  const bar        = document.getElementById('status-bar');
+  const msg        = document.getElementById('status-msg');
+  const fill       = document.getElementById('progress-fill');
+  const captureBtn = document.getElementById('capture-btn');
   bar.classList.add('visible');
-  document.getElementById('capture-btn').disabled = true;
+  captureBtn.disabled      = true;
+  captureBtn.style.display = 'none';
 
   try {
     const result = await Tesseract.recognize(dataUrl, 'tur+eng', {
@@ -862,23 +840,35 @@ async function runOCR(dataUrl) {
     fill.style.width = '100%';
     msg.textContent  = '✅ Okundu, özetleniyor…';
 
-    if (!S.ocrText) {
-      showToast('Fotoğraftan metin çıkarılamadı. Daha net çekin.');
+    if (!S.ocrText || S.ocrText.length < 15) {
+      showToast('Fotoğraftan metin çıkarılamadı. Daha net ve yakından çekin.');
       bar.classList.remove('visible');
-      document.getElementById('capture-btn').disabled = false;
+      captureBtn.disabled      = false;
+      captureBtn.style.display = '';
       return;
     }
+
+    const totalChars = S.ocrText.length;
+    const validChars = (S.ocrText.match(/[a-zA-ZğüşıöçĞÜŞİÖÇ0-9\s]/g) || []).length;
+    const validRatio = validChars / totalChars;
+    const words      = S.ocrText.split(/\s+/).filter(w => w.length > 0);
+    const avgWordLen = words.reduce((s, w) => s + w.length, 0) / (words.length || 1);
+
+    if (validRatio < 0.60 || avgWordLen < 1.5) {
+      showQualityWarning(() => summarize());
+      return;
+    }
+
     await summarize();
   } catch (err) {
     showToast('OCR hatası: ' + err.message);
     bar.classList.remove('visible');
-    document.getElementById('capture-btn').disabled = false;
+    captureBtn.disabled      = false;
+    captureBtn.style.display = '';
   }
 }
 
-// ─────────────────────────────────────────
-//  GROQ — ÖZETLEME
-// ─────────────────────────────────────────
+// LLM Özetlemesi
 async function summarize() {
   const card = document.getElementById('description-card');
   const el   = document.getElementById('description-text');
@@ -893,40 +883,30 @@ async function summarize() {
 
     S.summary = answer;
     S.history  = [{ role: 'assistant', content: answer }];
-    el.textContent = answer;
+    el.innerHTML = renderMd(answer);
 
     document.getElementById('status-bar').classList.remove('visible');
-    document.getElementById('capture-btn').disabled = false;
     document.getElementById('new-photo-btn').classList.add('visible');
     document.getElementById('chat-section').classList.add('visible');
-
-    // Özeti otomatik seslendir (sadece özet için)
-    speakMain(answer);
 
   } catch (err) {
     el.textContent = 'Özetleme sırasında hata oluştu.';
     showToast(err.message);
     document.getElementById('status-bar').classList.remove('visible');
-    document.getElementById('capture-btn').disabled = false;
   }
 }
 
-// ─────────────────────────────────────────
-//  GROQ — SORU-CEVAP
-// ─────────────────────────────────────────
+// LLM Chat Kısmı
 async function askGroq(question) {
   S.history.push({ role: 'user', content: question });
   const answer = await callGroq([
-    { role: 'system', content: SYSTEM_PROMPT + '\n\n--- BELGE ---\n' + S.ocrText + '\n--- SON ---' },
+    { role: 'system', content: SYSTEM_PROMPT_CHAT + '\n\n--- BELGE ---\n' + S.ocrText + '\n--- SON ---' },
     ...S.history,
   ], 512, 0.4);
   S.history.push({ role: 'assistant', content: answer });
   return answer;
 }
 
-// ─────────────────────────────────────────
-//  GROQ — ORTAK FETCH
-// ─────────────────────────────────────────
 async function callGroq(messages, maxTokens = 1024, temperature = 0.35) {
   const res = await fetch(PROXY, {
     method: 'POST',
@@ -941,60 +921,117 @@ async function callGroq(messages, maxTokens = 1024, temperature = 0.35) {
   return data.choices[0].message.content.trim();
 }
 
-// ─────────────────────────────────────────
-//  TTS — Web Speech API (iyileştirilmiş)
-// ─────────────────────────────────────────
-function getBestVoice() {
-  const voices = speechSynthesis.getVoices();
-  // Önce Türkçe online sesleri dene (çok daha doğal)
-  const priority = [
-    v => v.lang === 'tr-TR' && !v.localService,
-    v => v.lang === 'tr-TR',
-    v => v.lang.startsWith('tr'),
-  ];
-  for (const check of priority) {
-    const found = voices.find(check);
-    if (found) return found;
-  }
-  return null;
+// Text to Speech Kısmı
+function hashText(t) { return t.trim().substring(0, 80); }
+let ttsSession = 0;
+
+function _stopMediaOnly() {
+  ttsSession++;
+  if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; currentAudio = null; }
+  if (window.speechSynthesis) speechSynthesis.cancel();
 }
 
-function speakText(text, onEnd) {
-  stopAllSpeech();
-  if (!text || !window.speechSynthesis) return;
+async function speakText(text, onEnd) {
+  _stopMediaOnly();
+  
+  if (window.speechSynthesis && !window.__ttsUnlocked) {
+  window.__ttsUnlocked = true;
+  const u = new SpeechSynthesisUtterance("");
+  speechSynthesis.speak(u);
+}
 
-  const utt    = new SpeechSynthesisUtterance(text);
-  utt.lang     = 'tr-TR';
-  utt.rate     = 0.82;   // biraz daha yavaş = daha anlaşılır
-  utt.pitch    = 1.0;
-  utt.volume   = 1.0;
-  const voice  = getBestVoice();
-  if (voice) utt.voice = voice;
+  const mySession = ttsSession;
+  if (!text) { onEnd?.(); return; }
 
-  utt.onend   = () => { if (onEnd) onEnd(); };
-  utt.onerror = () => { if (onEnd) onEnd(); };
+  const safeEnd = () => { if (ttsSession === mySession) onEnd?.(); };
 
-  speechSynthesis.speak(utt);
+  if (S.ttsMode === 'webspeech') {
+    speakFallback(text, safeEnd, mySession);
+    return;
+  }
+
+  const key = hashText(text);
+  try {
+    let base64;
+    if (ttsCache[key]) {
+      base64 = ttsCache[key];
+    } else {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const res = await fetch(TTS_PROXY, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ text, voice: 'tr-TR-EmelNeural' }),
+        signal:  controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      if (!data.audio) throw new Error('Ses verisi boş.');
+      ttsCache[key] = data.audio;
+      base64 = data.audio;
+    }
+
+    if (ttsSession !== mySession) return; 
+
+    const audio = new Audio('data:audio/mp3;base64,' + base64);
+    currentAudio = audio;
+    audio.onended = () => { currentAudio = null; safeEnd(); };
+    audio.onerror = () => {
+      currentAudio = null;
+      S.ttsMode = 'webspeech';
+      if (ttsSession === mySession) speakFallback(text, safeEnd, mySession);
+    };
+    await audio.play();
+
+  } catch (err) {
+    S.ttsMode = 'webspeech';
+    if (ttsSession === mySession) speakFallback(text, safeEnd, mySession);
+  }
+}
+
+function speakFallback(text, onEnd, mySession) {
+  if (!window.speechSynthesis) { onEnd?.(); return; }
+
+  let fired = false;
+  const doSpeak = () => {
+    if (fired || ttsSession !== mySession) return;
+    fired = true;
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang  = 'tr-TR';
+    utt.rate  = 0.92;
+    utt.pitch = 1.1;
+    const tr  = speechSynthesis.getVoices().find(v => v.lang?.startsWith('tr'));
+    if (tr) utt.voice = tr;
+    utt.onend   = onEnd;
+    utt.onerror = onEnd;
+    speechSynthesis.speak(utt);
+  };
+
+  if (speechSynthesis.getVoices().length > 0) {
+    doSpeak();
+  } else {
+    speechSynthesis.addEventListener('voiceschanged', doSpeak, { once: true });
+    setTimeout(doSpeak, 1000);
+  }
 }
 
 function stopAllSpeech() {
-  speechSynthesis.cancel();
-  // Tüm bubble speak butonlarını sıfırla
+  _stopMediaOnly();
+  currentAudio = null;
   document.querySelectorAll('.bubble-speak').forEach(b => {
     b.classList.remove('playing');
-    b.textContent = '🔊 Dinle';
+    b.innerHTML = '🔊 Dinle';
   });
-  // Özet butonunu sıfırla
   setMainTTSOff();
   S.activeSpeakId = null;
 }
 
-// Özet TTS
 function speakMain(text) {
-  speakText(text, () => setMainTTSOff());
   S.mainSpeaking = true;
   document.getElementById('tts-btn').classList.add('speaking');
   document.getElementById('tts-label').textContent = 'Durdurmak İçin Bas';
+  speakText(text, () => setMainTTSOff());
 }
 
 function setMainTTSOff() {
@@ -1005,20 +1042,11 @@ function setMainTTSOff() {
 }
 
 function toggleMainTTS() {
-  if (S.mainSpeaking) {
-    stopAllSpeech();
-  } else {
-    stopAllSpeech();
-    speakMain(S.summary);
-  }
+  S.mainSpeaking ? stopAllSpeech() : speakMain(S.summary);
 }
 
-// Bubble TTS — sohbette manuel, otomatik değil
 function toggleBubbleSpeak(id, text, btn) {
-  if (S.activeSpeakId === id) {
-    stopAllSpeech();
-    return;
-  }
+  if (S.activeSpeakId === id) { stopAllSpeech(); return; }
   stopAllSpeech();
   S.activeSpeakId = id;
   btn.classList.add('playing');
@@ -1030,22 +1058,11 @@ function toggleBubbleSpeak(id, text, btn) {
   });
 }
 
-speechSynthesis.onvoiceschanged = () => {};
-
-// ─────────────────────────────────────────
-//  STT — Web Speech API
-// ─────────────────────────────────────────
+// Speech to Text Kısmı
 function toggleVoice() {
-  if (S.recording) {
-    S.recognition?.stop();
-    setRecOff();
-    return;
-  }
+  if (S.recording) { S.recognition?.stop(); setRecOff(); return; }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) {
-    showToast('Tarayıcınız ses tanımayı desteklemiyor. Lütfen yazarak sorun.');
-    return;
-  }
+  if (!SR) { showToast('Tarayıcınız ses tanımayı desteklemiyor. Lütfen yazarak sorun.'); return; }
   stopAllSpeech();
   const rec = new SR();
   rec.lang  = 'tr-TR';
@@ -1071,9 +1088,7 @@ function setRecOff() {
   document.getElementById('voice-label').textContent = 'Sesli Soru Sor';
 }
 
-// ─────────────────────────────────────────
-//  METİN GİRİŞİ
-// ─────────────────────────────────────────
+// Metin Girişi
 function sendText() {
   const inp = document.getElementById('text-q');
   const q   = inp.value.trim();
@@ -1085,26 +1100,21 @@ document.getElementById('text-q').addEventListener('keydown', e => {
   if (e.key === 'Enter') sendText();
 });
 
-// ─────────────────────────────────────────
-//  SORU İŞLEME
-// ─────────────────────────────────────────
+// Soruyu LLM'e Yollama
 async function handleQuestion(q) {
   document.getElementById('voice-status').textContent = '';
   addBubble('user', q);
   const thinkId = addBubble('ai', '<div class="dots"><span></span><span></span><span></span></div>', true);
-
   try {
     const answer = await askGroq(q);
-    updateBubble(thinkId, answer);  // otomatik seslendirme YOK — kullanıcı "Dinle" butonuna basar
+    updateBubble(thinkId, answer);
   } catch (err) {
     updateBubble(thinkId, 'Bir hata oluştu: ' + err.message);
     showToast(err.message);
   }
 }
 
-// ─────────────────────────────────────────
-//  BUBBLE YARDIMCILARI
-// ─────────────────────────────────────────
+// Bubble Kısmı
 function addBubble(type, content, isRaw = false) {
   const id   = 'b' + (++S.bubbleIdx);
   const msgs = document.getElementById('messages');
@@ -1112,7 +1122,7 @@ function addBubble(type, content, isRaw = false) {
   el.className = 'bubble ' + type;
   el.id        = id;
   el.innerHTML = `<div class="who">${type === 'ai' ? '👁️ Yardımcı Göz' : '🧑 Siz'}</div>`
-               + (isRaw ? content : esc(content));
+               + (isRaw ? content : renderMd(content));
   msgs.appendChild(el);
   el.scrollIntoView({ behavior: 'smooth', block: 'end' });
   return id;
@@ -1121,55 +1131,57 @@ function addBubble(type, content, isRaw = false) {
 function updateBubble(id, text) {
   const el = document.getElementById(id);
   if (!el) return;
-  const safeText = JSON.stringify(text);
-  el.innerHTML = `<div class="who">👁️ Yardımcı Göz</div>${esc(text)}`
-    + `<button class="bubble-speak" id="spk-${id}" onclick="toggleBubbleSpeak('${id}',${safeText},this)">🔊 Dinle</button>`;
+  el.innerHTML = `<div class="who">👁️ Yardımcı Göz</div>${renderMd(text)}`;
+  const btn = document.createElement('button');
+  btn.className   = 'bubble-speak';
+  btn.id          = 'spk-' + id;
+  btn.textContent = '🔊 Dinle';
+  btn.dataset.text = text;
+  btn.onclick = function() { toggleBubbleSpeak(id, this.dataset.text, this); };
+  el.appendChild(btn);
   el.scrollIntoView({ behavior: 'smooth', block: 'end' });
 }
-
-function esc(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-// ─────────────────────────────────────────
-//  SOHBET TEMİZLE
-// ─────────────────────────────────────────
+// Sohbet Temizleme
 function clearChat() {
   stopAllSpeech();
-  S.history    = S.history.slice(0, 1); // ilk asistan mesajını koru
-  S.bubbleIdx  = 0;
+  S.history   = S.history.slice(0, 1);
+  S.bubbleIdx = 0;
   document.getElementById('messages').innerHTML = '';
   document.getElementById('voice-status').textContent = '';
 }
 
-// ─────────────────────────────────────────
-//  SIFIRLAMA
-// ─────────────────────────────────────────
+// Sıfırlama
 function resetApp() {
   stopAllSpeech();
   S.recognition?.stop();
-  Object.assign(S, { ocrText:'', summary:'', history:[], recording:false, bubbleIdx:0, activeSpeakId:null, mainSpeaking:false });
+  Object.assign(S, {
+    ocrText: '', summary: '', history: [],
+    recording: false, bubbleIdx: 0,
+    activeSpeakId: null, mainSpeaking: false,
+  });
 
   const img = document.getElementById('preview-img');
   img.src = ''; img.style.display = 'none';
   document.getElementById('preview-placeholder').style.display = 'flex';
   document.getElementById('preview-box').classList.remove('has-image');
   document.getElementById('description-card').classList.remove('visible');
-  document.getElementById('description-text').textContent = '';
+  document.getElementById('description-text').innerHTML = '';
   document.getElementById('new-photo-btn').classList.remove('visible');
   document.getElementById('chat-section').classList.remove('visible');
   document.getElementById('messages').innerHTML = '';
   document.getElementById('status-bar').classList.remove('visible');
   document.getElementById('progress-fill').style.width = '0%';
   document.getElementById('voice-status').textContent = '';
-  document.getElementById('capture-btn').disabled = false;
+
+  const captureBtn = document.getElementById('capture-btn');
+  captureBtn.disabled      = false;
+  captureBtn.style.display = '';
+
   document.getElementById('welcome').style.display = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ─────────────────────────────────────────
-//  TOAST
-// ─────────────────────────────────────────
+// Toast
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
