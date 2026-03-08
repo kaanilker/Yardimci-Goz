@@ -1,8 +1,0 @@
-<Files "config.php">
-    Order Allow,Deny
-    Deny from all
-</Files>
-
-<Limit GET POST OPTIONS>
-    Allow from all
-</Limit>
