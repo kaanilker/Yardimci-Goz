@@ -202,6 +202,16 @@
     }
     #welcome p { font-size: .88rem; color: var(--muted); line-height: 1.6; }
 
+    /* YENİ: Worker hazırlık göstergesi */
+    #worker-status {
+      font-size: .78rem;
+      color: var(--muted-s);
+      text-align: center;
+      padding: 4px 0;
+      transition: opacity .4s;
+    }
+    #worker-status.ready { color: var(--green-h); }
+
     .step-label {
       font-size: .78rem;
       font-weight: 900;
@@ -610,6 +620,9 @@
     <p>Anlamakta zorlandığınız bir belge mi var?<br/>Fotoğrafını çekin, size kolayca açıklayalım.</p>
   </div>
 
+  <!-- YENİ: Worker hazırlık durumu göstergesi -->
+  <div id="worker-status">⏳ OCR motoru hazırlanıyor…</div>
+
   <div class="step-label">📷 Adım 1 — Fotoğraf Seç</div>
 
   <input type="file" id="file-input-gallery" accept="image/*" />
@@ -717,6 +730,64 @@ const TTS_PROXY = 'tts-proxy.php';
 const ttsCache  = {};
 let   currentAudio = null;
 
+// Tesseract.js Kısmı
+let ocrWorker = null;
+
+async function initOCRWorker() {
+  const statusEl = document.getElementById('worker-status');
+  try {
+    ocrWorker = await Tesseract.createWorker('tur+eng', 1, {
+    });
+    await ocrWorker.setParameters({
+      tessedit_pageseg_mode: '6',
+      preserve_interword_spaces: '1',
+    });
+    statusEl.textContent = '✅ OCR motoru hazır';
+    statusEl.classList.add('ready');
+    // 3 saniye sonra göstergeyi gizle
+    setTimeout(() => { statusEl.style.opacity = '0'; }, 3000);
+  } catch (err) {
+    statusEl.textContent = '⚠️ OCR motoru yüklenemedi: ' + err.message;
+  }
+}
+
+// Sayfa yüklenince worker'ı başlat
+window.addEventListener('load', initOCRWorker);
+
+// OCR Doğruluğu Artırma
+function preprocessImage(dataUrl) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const scale  = Math.max(1, 1200 / img.width);
+      canvas.width  = Math.round(img.width  * scale);
+      canvas.height = Math.round(img.height * scale);
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const d = imageData.data;
+
+      for (let i = 0; i < d.length; i += 4) {
+        const gray = d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114;
+
+        const contrasted = gray > 128
+          ? Math.min(255, gray + (255 - gray) * 0.35)
+          : Math.max(0,   gray - gray * 0.35);
+
+        d[i] = d[i+1] = d[i+2] = contrasted;
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = () => resolve(dataUrl); // Hata olursa orijinali kullan
+    img.src = dataUrl;
+  });
+}
+
 const SYSTEM_PROMPT = `Sen yaşlı bireylere yardım eden, sabırlı ve nazik bir belge asistanısın. Adın "Yardımcı Göz".
 Görevin:
 1. Verilen belge metnini ÇOK SADE Türkçeyle özetlemek.
@@ -740,6 +811,16 @@ function renderMd(text) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+
+// TTS'e göndermeden önce markdown işaretlerini temizle
+function stripMd(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '$1') 
+    .replace(/\*(.+?)\*/g,     '$1') 
+    .replace(/`(.+?)`/g,       '$1') 
+    .replace(/#{1,6}\s/g,      '')    
+    .trim();
 }
 
 // Yazı Boyutu Ayarlama
@@ -815,7 +896,7 @@ function qualityCancel() {
   resetApp();
 }
 
-// Görüntüyü Metne Çevirme
+// OCR Kısmı
 async function runOCR(dataUrl) {
   const bar        = document.getElementById('status-bar');
   const msg        = document.getElementById('status-msg');
@@ -826,7 +907,18 @@ async function runOCR(dataUrl) {
   captureBtn.style.display = 'none';
 
   try {
-    const result = await Tesseract.recognize(dataUrl, 'tur+eng', {
+    msg.textContent = '🖼️ Görüntü hazırlanıyor…';
+    const cleanUrl = await preprocessImage(dataUrl);
+
+    if (!ocrWorker) {
+      msg.textContent = '⏳ OCR motoru yükleniyor…';
+      await initOCRWorker();
+    }
+
+    const result = await ocrWorker.recognize(cleanUrl, {
+      rotateAuto: true,
+    }, {
+      // İlerleme callback'i
       logger: m => {
         if (m.status === 'recognizing text') {
           const p = Math.round((m.progress || 0) * 100);
@@ -1031,7 +1123,7 @@ function speakMain(text) {
   S.mainSpeaking = true;
   document.getElementById('tts-btn').classList.add('speaking');
   document.getElementById('tts-label').textContent = 'Durdurmak İçin Bas';
-  speakText(text, () => setMainTTSOff());
+  speakText(stripMd(text), () => setMainTTSOff());
 }
 
 function setMainTTSOff() {
@@ -1137,10 +1229,11 @@ function updateBubble(id, text) {
   btn.id          = 'spk-' + id;
   btn.textContent = '🔊 Dinle';
   btn.dataset.text = text;
-  btn.onclick = function() { toggleBubbleSpeak(id, this.dataset.text, this); };
+  btn.onclick = function() { toggleBubbleSpeak(id, stripMd(this.dataset.text), this); };
   el.appendChild(btn);
   el.scrollIntoView({ behavior: 'smooth', block: 'end' });
 }
+
 // Sohbet Temizleme
 function clearChat() {
   stopAllSpeech();
@@ -1179,6 +1272,7 @@ function resetApp() {
 
   document.getElementById('welcome').style.display = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  // YENİ: Worker sıfırlamada silinmez — hazır kalmaya devam eder
 }
 
 // Toast
