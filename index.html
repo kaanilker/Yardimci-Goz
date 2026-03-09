@@ -362,7 +362,7 @@
 </footer>
 
 <script>
-// ─── Durum ────────────────────────────────────────────────────
+// Durum
 const S = {
   ocrText:       '',
   summary:       '',
@@ -428,7 +428,7 @@ function setFont(idx) {
   setFont(saved !== null ? parseInt(saved) : 0);
 })();
 
-// ─Modal ve LightBox
+// Modal ve LightBox
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function openLightbox(src) {
@@ -485,7 +485,7 @@ function qualityCancel() {
   resetApp();
 }
 
-// ─── OCR ──────────────────────────────────────────────────────
+// OCR 
 async function runOCR(dataUrl) {
   const bar = document.getElementById('status-bar');
   const msg = document.getElementById('status-msg');
@@ -868,7 +868,7 @@ function resetApp() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ─── Toast ────────────────────────────────────────────────────
+// Toast
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
