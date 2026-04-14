@@ -1192,18 +1192,6 @@ Görevin:
         captureBtn.style.display = isBusy ? "none" : "";
       }
 
-      function collectSuspiciousTokens(text) {
-        return text
-          .split(/\s+/)
-          .filter(Boolean)
-          .filter(
-            (w) =>
-              w.length >= 4 &&
-              /[^a-zA-ZğüşıöçĞÜŞİÖÇ0-9.,:;!?()%\-_'"/]/.test(w),
-          )
-          .slice(0, 8);
-      }
-
       function extractOcrWordStats(words) {
         const normalized = (Array.isArray(words) ? words : [])
           .map((w) => ({
@@ -1225,10 +1213,11 @@ Görevin:
           : 0;
 
         const reliableWordCount = meaningfulWords.filter(
-          (w) => (w.confidence ?? 0) >= 45,
+          (w) => (w.confidence ?? 0) >= 40,
         ).length;
 
         return {
+          totalWordCount: normalized.length,
           meaningfulWordCount: meaningfulWords.length,
           reliableWordCount,
           avgWordConfidence,
@@ -1237,8 +1226,9 @@ Görevin:
 
       function analyzeOcrQuality(text, ocrData = {}) {
         const compactText = text.replace(/\s+/g, "");
+        // Türkçe belgelerdeki yaygın noktalama işaretlerini de "okunabilir" say
         const readableChars = (
-          compactText.match(/[a-zA-ZğüşıöçĞÜŞİÖÇ0-9]/g) || []
+          compactText.match(/[a-zA-ZğüşıöçĞÜŞİÖÇ0-9.,;:!?\-\/()%₺€$&@#+'"]/g) || []
         ).length;
         const readableRatio = compactText.length
           ? readableChars / compactText.length
@@ -1249,28 +1239,47 @@ Görevin:
           words.reduce((sum, w) => sum + w.length, 0) / (words.length || 1);
         const longWordCount = words.filter((w) => w.length >= 3).length;
 
-        const { meaningfulWordCount, reliableWordCount, avgWordConfidence } =
-          extractOcrWordStats(ocrData?.words);
+        const {
+          totalWordCount,
+          meaningfulWordCount,
+          reliableWordCount,
+          avgWordConfidence,
+        } = extractOcrWordStats(ocrData?.words);
 
         const confidence = Number.isFinite(Number(ocrData?.confidence))
           ? Number(ocrData.confidence)
           : 100;
-        const lowConfidence = confidence < 65;
-        const noisyCharacters = readableRatio < 0.72;
-        const weakWordStructure = avgWordLen < 2.2 && longWordCount < 5;
+        // Tesseract Türkçe metin için düşük güven verir; eşikleri gevşet
+        const lowConfidence = confidence < 45;
+        const noisyCharacters = readableRatio < 0.50;
+        const weakWordStructure = avgWordLen < 1.8 && longWordCount < 3;
 
-        const hasTooFewReadableChars = readableChars < 12;
-        const hasTooFewWords = meaningfulWordCount < 2;
-        const mostlyUnreliableWords =
-          reliableWordCount < 2 && readableChars < 28;
-        const veryLowWordConfidence =
-          avgWordConfidence > 0 && avgWordConfidence < 35 && readableChars < 32;
+        const textMeaningfulWordCount = words.filter((w) => {
+          const letters = w.replace(/[^a-zA-ZğüşıöçĞÜŞİÖÇ0-9]/g, "");
+          return letters.length >= 2;
+        }).length;
+
+        const hasWordLevelData = totalWordCount > 0;
+        const hasTooFewReadableChars = readableChars < 4;
+        const hasTooFewTextWords = textMeaningfulWordCount < 2;
+        const hasNoisyAndShortText = readableRatio < 0.30 && readableChars < 12;
+        const hasWeakWordEvidence =
+          hasWordLevelData &&
+          meaningfulWordCount <= 1 &&
+          reliableWordCount === 0 &&
+          avgWordConfidence > 0 &&
+          avgWordConfidence < 18;
+
+        // Daha geniş "güçlü sinyal" eşiği — 15+ okunabilir karakter yeterli
+        const hasStrongTextSignal =
+          readableChars >= 15 ||
+          (textMeaningfulWordCount >= 3 && readableRatio >= 0.40);
 
         const isNoReadableText =
-          hasTooFewReadableChars ||
-          hasTooFewWords ||
-          mostlyUnreliableWords ||
-          veryLowWordConfidence;
+          !hasStrongTextSignal &&
+          ((hasTooFewReadableChars && hasTooFewTextWords) ||
+            (hasTooFewTextWords && hasNoisyAndShortText) ||
+            (hasTooFewReadableChars && hasWeakWordEvidence));
 
         return {
           confidence,
@@ -1280,13 +1289,90 @@ Görevin:
           reliableWordCount,
           avgWordConfidence,
           isNoReadableText,
-          suspiciousTokens: collectSuspiciousTokens(text),
           isLowQuality:
             !isNoReadableText &&
             (lowConfidence ||
-              (noisyCharacters && confidence < 80) ||
+              (noisyCharacters && confidence < 60) ||
               weakWordStructure),
         };
+      }
+
+      // Görüntü ön işleme: adaptif – belge türüne göre farklı filtre uygular
+      function preprocessImage(dataUrl) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+
+            // Orijinal resmi çiz
+            ctx.drawImage(img, 0, 0);
+
+            // Küçük örnekle resmi analiz et
+            const sw = Math.min(img.width, 200);
+            const sh = Math.min(img.height, 200);
+            const sCanvas = document.createElement("canvas");
+            sCanvas.width = sw;
+            sCanvas.height = sh;
+            const sCtx = sCanvas.getContext("2d");
+            sCtx.drawImage(img, 0, 0, sw, sh);
+            const pixels = sCtx.getImageData(0, 0, sw, sh).data;
+
+            let totalSaturation = 0;
+            let brightCount = 0;   // Çok açık pikseller (beyaz kağıt)
+            let darkCount = 0;     // Çok koyu pikseller (siyah metin)
+            let midCount = 0;      // Orta gri pikseller (S/B baskıda gri tonlar)
+            let sampledCount = 0;
+
+            for (let i = 0; i < pixels.length; i += 16) { // Her 4. piksel
+              const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+              const maxC = Math.max(r, g, b);
+              const minC = Math.min(r, g, b);
+              const lum = (r + g + b) / 3;
+              sampledCount++;
+
+              // Renk doygunluğu
+              totalSaturation += maxC > 0 ? (maxC - minC) / maxC : 0;
+
+              // Aydınlık dağılımı — 3 bölge
+              if (lum > 200) brightCount++;
+              else if (lum < 55) darkCount++;
+              else midCount++;  // 55-200 arası = gri bölge
+            }
+
+            const avgSaturation = totalSaturation / sampledCount;
+            const brightRatio = brightCount / sampledCount;
+            const darkRatio = darkCount / sampledCount;
+            const midRatio = midCount / sampledCount;
+
+            const isGrayscale = avgSaturation < 0.12;
+            const isHighContrast = (brightRatio + darkRatio) > 0.6;
+            const hasManyMidTones = midRatio > 0.35;
+
+            // 3 kategori belirle
+            let filter;
+            if (isGrayscale && isHighContrast && !hasManyMidTones) {
+              // ① Gerçek S/B belge (siyah metin, beyaz kağıt) → dokunma
+              filter = "grayscale(1)";
+            } else if (isGrayscale && hasManyMidTones) {
+              // ② Renkli belgenin S/B baskısı (gri tonlar çok) → güçlü kontrast
+              filter = "contrast(1.6) grayscale(1)";
+            } else {
+              // ③ Renkli fotoğraf → hafif kontrast
+              filter = "contrast(1.2) grayscale(1)";
+            }
+
+            ctx.filter = filter;
+            ctx.drawImage(canvas, 0, 0);
+            ctx.filter = "none";
+
+            resolve(canvas.toDataURL("image/png"));
+          };
+          img.onerror = () => resolve(dataUrl); // Hata olursa orijinali kullan
+          img.src = dataUrl;
+        });
       }
 
       // OCR
@@ -1298,7 +1384,11 @@ Görevin:
         setCaptureState(true);
 
         try {
-          const result = await Tesseract.recognize(dataUrl, "tur+eng", {
+          // Görüntüyü ön işle (kontrast/gri tonlama)
+          msg.textContent = "🔍 Görüntü hazırlanıyor…";
+          const processedUrl = await preprocessImage(dataUrl);
+
+          const result = await Tesseract.recognize(processedUrl, "tur", {
             logger: (m) => {
               if (m.status === "recognizing text") {
                 const p = Math.round((m.progress || 0) * 100);
@@ -1312,7 +1402,7 @@ Görevin:
           fill.style.width = "100%";
           msg.textContent = "✅ Okundu, özetleniyor…";
 
-          if (!S.ocrText || S.ocrText.length < 15) {
+          if (!S.ocrText || S.ocrText.length < 10) {
             showToast(
               "Fotoğraftan metin çıkarılamadı. Daha net ve yakından çekin.",
             );
@@ -1363,12 +1453,8 @@ Görevin:
             ? [
                 "",
                 `OCR kalite notu: güven skoru yaklaşık ${Math.round(quality?.confidence || 0)}/100.`,
-                "Emin olamadığın veya okuyamadığın bölümleri uydurmadan,",
-                'en sonda "⚠️ Okunamayan/Belirsiz Kısımlar" başlığı ile kısa maddeler halinde belirt.',
-                quality?.suspiciousTokens?.length
-                  ? "Bozulmuş olabilecek örnek parçalar: " +
-                    quality.suspiciousTokens.join(" | ")
-                  : "",
+                "Metni sadece net okuyabildiğin kısımlara göre sade biçimde özetle.",
+                "Okunamayan ya da belirsiz kısımlar için ayrı başlık veya madde ekleme.",
               ]
                 .filter(Boolean)
                 .join("\n")
@@ -1394,7 +1480,7 @@ Görevin:
           S.summary = answer;
           S.history = [{ role: "assistant", content: answer }];
           const lowQualityBanner = fromLowQualityOcr
-            ? '<div style="margin-bottom:12px;padding:10px 12px;border:1.5px solid #e1b36b;background:#fff7ea;color:#724d0d;border-radius:10px;font-size:.92rem;line-height:1.55;">⚠️ Bu fotoğrafta bazı yazılar net okunamadı. Emin olunamayan yerler özette ayrıca belirtildi.</div>'
+            ? '<div style="margin-bottom:12px;padding:10px 12px;border:1.5px solid #e1b36b;background:#fff7ea;color:#724d0d;border-radius:10px;font-size:.92rem;line-height:1.55;">⚠️ Bu fotoğrafta bazı yazılar net değil. Özet yalnızca okunabilen kısımlara göre hazırlandı.</div>'
             : "";
           el.innerHTML = lowQualityBanner + renderMd(answer);
           document.getElementById("status-bar").classList.remove("visible");
